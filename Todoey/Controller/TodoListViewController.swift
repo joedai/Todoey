@@ -89,14 +89,25 @@ class TodoListViewController: UITableViewController {
         }
     }
     
-    func loadItems(){
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()){
         do{
             itemArry = try self.context.fetch(request)
+            print(itemArry)
         }catch{
             print("Error while saving array \(error)")
         }
+        tableView.reloadData()
     }
     
 }
 
+extension TodoListViewController: UISearchBarDelegate{
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor.init(key: "title", ascending: true)]
+        request.predicate = NSPredicate.init(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        loadItems(with: request)
+    }
+}
