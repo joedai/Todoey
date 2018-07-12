@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		160FF7C320F5EDAF0041B3E5 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160FF7C220F5EDAF0041B3E5 /* CategoryTableViewController.swift */; };
 		5970B01C207999D1005AECA0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5970B01B207999D1005AECA0 /* AppDelegate.swift */; };
 		5970B01E207999D1005AECA0 /* TodoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5970B01D207999D1005AECA0 /* TodoListViewController.swift */; };
 		5970B021207999D1005AECA0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5970B01F207999D1005AECA0 /* Main.storyboard */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		160FF7C220F5EDAF0041B3E5 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		5970B018207999D1005AECA0 /* Todoey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todoey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5970B01B207999D1005AECA0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5970B01D207999D1005AECA0 /* TodoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListViewController.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				5970B01D207999D1005AECA0 /* TodoListViewController.swift */,
+				160FF7C220F5EDAF0041B3E5 /* CategoryTableViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -173,6 +176,7 @@
 				5970B01E207999D1005AECA0 /* TodoListViewController.swift in Sources */,
 				5970B01C207999D1005AECA0 /* AppDelegate.swift in Sources */,
 				59801F3A20B41B91006216BB /* DataModel.xcdatamodeld in Sources */,
+				160FF7C320F5EDAF0041B3E5 /* CategoryTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

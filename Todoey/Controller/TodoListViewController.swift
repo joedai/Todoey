@@ -11,6 +11,11 @@ import CoreData
 
 class TodoListViewController: UITableViewController {
     
+    var parentCategory: Category?{
+        didSet{
+            loadItems();
+        }
+    }
     var itemArry = [Item]()
     let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
     
@@ -19,13 +24,6 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         print(filePath!)
-        loadItems();
-
-        
-//        if let storedList = defaults.stringArray(forKey: "ToDoList") {
-//            itemArry = storedList
-//        }
-        // Do any additional setup after loading the view, typically from a nib.
     }
     
     //MARK: - Table view source
@@ -64,6 +62,7 @@ class TodoListViewController: UITableViewController {
             
             let item = Item(context: self.context)
             item.title = textField.text!
+            item.parentCategory = self.parentCategory
             
             self.itemArry.append(item)
 
@@ -89,12 +88,20 @@ class TodoListViewController: UITableViewController {
         }
     }
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()){
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil){
+        let categoryPredicate = NSPredicate(format: "parentCategory.title MATCHES %@", parentCategory!.title!)
+        
+        if let additionalPredicate = predicate{
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [additionalPredicate,categoryPredicate])
+        }else{
+            request.predicate = categoryPredicate
+        }
+        
         do{
             itemArry = try self.context.fetch(request)
             print(itemArry)
         }catch{
-            print("Error while saving array \(error)")
+            print("Error while loading array \(error)")
         }
         tableView.reloadData()
     }
@@ -110,4 +117,5 @@ extension TodoListViewController: UISearchBarDelegate{
         
         loadItems(with: request)
     }
+    
 }
