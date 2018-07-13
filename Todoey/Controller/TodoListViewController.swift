@@ -8,41 +8,46 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 class TodoListViewController: UITableViewController {
     
+    let realm = try! Realm()
     var parentCategory: Category?{
         didSet{
             loadItems();
         }
     }
-    var itemArry = [Item]()
-    let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
-    
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var items : Results<Item>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(filePath!)
     }
     
     //MARK: - Table view source
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
-        cell.textLabel?.text = itemArry[indexPath.row].title
+        cell.textLabel?.text = items?[indexPath.row].title ?? "No item created"
         
         return cell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemArry.count
+        return items?.count ?? 1
     }
 
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let item = itemArry[indexPath.row]
-        item.done = !item.done
+        let item = items![indexPath.row]
+        do{
+            try realm.write {
+                item.done = !item.done
+            }
+        }catch{
+            print("error while updating item \(error)")
+        }
+        
         
         let cell = tableView.cellForRow(at: indexPath)
         
@@ -50,7 +55,7 @@ class TodoListViewController: UITableViewController {
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        saveItems()
+//        saveItems()
     }
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
@@ -60,13 +65,16 @@ class TodoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add new item", style: .default, handler: { (action) in
             
-            let item = Item(context: self.context)
+            let item = Item()
             item.title = textField.text!
-            item.parentCategory = self.parentCategory
             
-            self.itemArry.append(item)
-
-            self.saveItems()
+            do{
+                try self.realm.write {
+                    self.realm.add(item)
+                }
+            }catch{
+                print("Error while saving item \(error)")
+            }
             
             self.tableView.reloadData()
         })
@@ -79,30 +87,11 @@ class TodoListViewController: UITableViewController {
         
         present(alert, animated: true, completion: nil)
     }
+
     
-    func saveItems(){
-        do{
-            try self.context.save()
-        }catch{
-            print("Error while saving array \(error)")
-        }
-    }
-    
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil){
-        let categoryPredicate = NSPredicate(format: "parentCategory.title MATCHES %@", parentCategory!.title!)
+    func loadItems(){
+        items = parentCategory?.items.sorted(byKeyPath: "title", ascending: true)
         
-        if let additionalPredicate = predicate{
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [additionalPredicate,categoryPredicate])
-        }else{
-            request.predicate = categoryPredicate
-        }
-        
-        do{
-            itemArry = try self.context.fetch(request)
-            print(itemArry)
-        }catch{
-            print("Error while loading array \(error)")
-        }
         tableView.reloadData()
     }
     
@@ -111,11 +100,14 @@ class TodoListViewController: UITableViewController {
 extension TodoListViewController: UISearchBarDelegate{
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor.init(key: "title", ascending: true)]
-        request.predicate = NSPredicate.init(format: "title CONTAINS[cd] %@", searchBar.text!)
-        
-        loadItems(with: request)
+        items = realm.objects(Item.self).filter("title CONTAINS[cd] %@", searchBar.text!)
+        tableView.reloadData()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if(searchText.isEmpty){
+            loadItems()
+        }
     }
     
 }
