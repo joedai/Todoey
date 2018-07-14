@@ -70,7 +70,7 @@ class TodoListViewController: UITableViewController {
             
             do{
                 try self.realm.write {
-                    self.realm.add(item)
+                    self.parentCategory!.items.append(item)
                 }
             }catch{
                 print("Error while saving item \(error)")
