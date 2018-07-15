@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeableTableViewController {
     
     let realm = try! Realm()
     var parentCategory: Category?{
@@ -22,11 +22,13 @@ class TodoListViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.rowHeight = 80
     }
     
     //MARK: - Table view source
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
+        
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         cell.textLabel?.text = items?[indexPath.row].title ?? "No item created"
         
         return cell
@@ -93,6 +95,16 @@ class TodoListViewController: UITableViewController {
         items = parentCategory?.items.sorted(byKeyPath: "title", ascending: true)
         
         tableView.reloadData()
+    }
+    
+    override func deleteModel(at indexPath: IndexPath) {
+        do{
+            try realm.write {
+                realm.delete(items![indexPath.row])
+            }
+        }catch{
+            print("error writing item \(error)")
+        }
     }
     
 }
